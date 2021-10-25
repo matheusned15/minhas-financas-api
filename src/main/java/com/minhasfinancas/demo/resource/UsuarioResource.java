@@ -1,6 +1,7 @@
 package com.minhasfinancas.demo.resource;
 
 import com.minhasfinancas.demo.dto.UsuarioDTO;
+import com.minhasfinancas.demo.exception.ErroAutenticacao;
 import com.minhasfinancas.demo.exception.RegraNegocioException;
 import com.minhasfinancas.demo.model.entity.Usuario;
 import com.minhasfinancas.demo.service.UsuarioService;
@@ -19,6 +20,16 @@ public class UsuarioResource {
 
     public UsuarioResource(UsuarioService service) {
         this.service = service;
+    }
+
+    @PostMapping("/autenticar")
+    public ResponseEntity autenticar(@RequestBody UsuarioDTO dto) {
+        try {
+            Usuario usuarioAutenticado = service.autenticar(dto.getEmail(), dto.getSenha());
+            return ResponseEntity.ok(usuarioAutenticado);
+        } catch (ErroAutenticacao e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping
