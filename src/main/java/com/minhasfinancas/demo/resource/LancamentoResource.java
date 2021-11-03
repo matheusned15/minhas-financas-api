@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import com.minhasfinancas.demo.dto.LancamentoDTO;
+import com.minhasfinancas.demo.exception.RegraNegocioException;
+import com.minhasfinancas.demo.model.entity.Lancamento;
+import com.minhasfinancas.demo.model.entity.Usuario;
+import com.minhasfinancas.demo.model.enums.StatusLancamento;
+import com.minhasfinancas.demo.model.enums.TipoLancamento;
 import com.minhasfinancas.demo.service.LancamentoService;
 import com.minhasfinancas.demo.service.UsuarioService;
 import org.springframework.http.HttpStatus;
@@ -26,12 +31,31 @@ import lombok.RequiredArgsConstructor;
 public class LancamentoResource {
 
     private final LancamentoService service;
-    private final UsuarioService usuarioService;
+    private UsuarioService usuarioService;
 
 
     @PostMapping
     public ResponseEntity salvar(@RequestBody LancamentoDTO dto){
         return null;
+
+    }
+
+    private Lancamento converter(LancamentoDTO dto){
+        Lancamento lancamento = new Lancamento();
+        lancamento.setId(dto.getId());
+        lancamento.setDescricao(dto.getDescricao());
+        lancamento.setAno(dto.getAno());
+        lancamento.setMes(dto.getMes());
+        lancamento.setValor(dto.getValor());
+
+        Usuario usuario = usuarioService.obterPorId(dto.getUsuario())
+                .orElseThrow( () -> new RegraNegocioException("Usuário não encontrando para o Id informado"));
+
+        lancamento.setUsuario(usuario);
+        lancamento.setTipo(TipoLancamento.valueOf(dto.getTipo()));
+        lancamento.setStatus(StatusLancamento.valueOf(dto.getStatus()));
+
+        return lancamento;
 
     }
 }
