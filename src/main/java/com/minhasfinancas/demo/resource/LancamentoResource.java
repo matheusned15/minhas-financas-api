@@ -33,6 +33,27 @@ public class LancamentoResource {
     private final LancamentoService service;
     private UsuarioService usuarioService;
 
+    @GetMapping
+    public ResponseEntity buscar(
+            @RequestParam(value = "descricao", required = false) String descricao,
+            @RequestParam(value = "mes", required = false) Integer mes,
+            @RequestParam(value = "ano", required = false) Integer ano,
+            @RequestParam(value = "usuario", required = false) Long idUsuario
+    ) {
+        Lancamento lancamentoFiltro = new Lancamento();
+        lancamentoFiltro.setDescricao(descricao);
+        lancamentoFiltro.setMes(mes);
+        lancamentoFiltro.setAno(ano);
+
+        Optional<Usuario> usuario = usuarioService.obterPorId(idUsuario);
+        if (usuario.isPresent()) {
+            return ResponseEntity.badRequest().body("Não foi possivel realizar a consulta. Usuário não encontrando para o Id informado");
+        } else {
+            lancamentoFiltro.setUsuario(usuario.get());
+        }
+        List<Lancamento> lancamentos = service.buscar(lancamentoFiltro);
+        return ResponseEntity.ok(lancamentos);
+    }
 
     @PostMapping
     public ResponseEntity salvar(@RequestBody LancamentoDTO dto) {
