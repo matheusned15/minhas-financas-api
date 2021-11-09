@@ -31,7 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class LancamentoResource {
 
     private final LancamentoService service;
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+
 
     @GetMapping
     public ResponseEntity buscar(
